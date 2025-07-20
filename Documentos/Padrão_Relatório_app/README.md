@@ -2,7 +2,16 @@
 
 Aplicativo Flutter para técnicos criarem relatórios padronizados de peças e enviarem via WhatsApp.
 
-## Funcionalidades
+👋 **Desenvolvido por Hendel Santos**  
+Desenvolvedor especializado em Django, apaixonado por criar sistemas web robustos e inteligentes para diversos segmentos - de manutenção industrial a soluções comerciais. Me especializando em IA generativa e Engenharia de Prompt, focada em acelerar resultados com tecnologia prática e escalável.
+
+## 🚀 Sobre este Projeto
+
+💡 **"O Futuro é programável"**
+
+Este aplicativo Flutter representa a evolução natural dos meus sistemas de manutenção industrial, agora em formato mobile para uso em campo. Desenvolvido com foco na praticidade e eficiência dos técnicos, oferece uma solução completa para documentação e comunicação de atividades de manutenção.
+
+## ✨ Funcionalidades
 
 - ✅ **Scanner QR Code**: Escaneia códigos QR ou códigos de barras de 17 caracteres
 - ✅ **Formulário Padronizado**: Campos estruturados para relatórios de peças
@@ -13,7 +22,42 @@ Aplicativo Flutter para técnicos criarem relatórios padronizados de peças e e
 - ✅ **Validação de Dados**: Verificação automática dos campos obrigatórios
 - ✅ **Interface Amigável**: Design intuitivo para uso em campo
 
-## Campos do Inventário
+## 🛠️ Tecnologias Utilizadas
+
+![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
+![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)
+![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)
+![iOS](https://img.shields.io/badge/iOS-000000?style=for-the-badge&logo=ios&logoColor=white)
+
+**Stack Principal:**
+- **Flutter 3.32.5+** - Framework multiplataforma
+- **Dart 3.8.1+** - Linguagem de programação
+- **Material Design 3** - Interface moderna e responsiva
+- **Mobile Scanner** - Scanner QR Code nativo
+- **URL Launcher** - Integração com apps externos
+
+## 🌟 Outros Projetos em Destaque
+
+### 📋 Sistema de Demandas - Django (Controle V1)
+Sistema completo de controle de demandas com Django, SQLite, Bootstrap e painel administrativo
+👉 [Ver Projeto](https://github.com/hendelsantos)
+
+### 📦 CRM de Estoque - Flask  
+Sistema completo de estoque com cartões, planilhas, filtros e painel admin
+
+### 🛠️ Rede Engrenagem
+Rede social corporativa para técnicos de manutenção com feed e upload de fotos
+
+### ☁️ PhotoCloud
+Sistema de armazenamento de fotos com galeria web, upload rápido e exclusão automática por tempo configurado. Hospedado no Render, disponível para uso em produção.
+
+## 🧠 Minha Visão Tecnológica
+
+🔧 Desenvolvo CRMs, redes sociais técnicas, sistemas de estoque e ferramentas visuais voltadas para o setor industrial  
+📚 Em constante evolução: Python, Django, Flutter - sempre com projetos práticos  
+🤖 Estudando Engenharia de Prompt e IA Generativa - **o maior ativo de uma empresa é o tempo!**
+
+## 📱 Campos do Inventário
 
 1. **Catalog** *(obrigatório)*: Código do catálogo (17 caracteres)
 2. **Quantidade Unrestrict** *(obrigatório)*: Quantidade da peça
@@ -23,7 +67,7 @@ Aplicativo Flutter para técnicos criarem relatórios padronizados de peças e e
 6. **RFB** *(opcional)*: Return for Billing
 7. **Observações** *(opcional)*: Comentários adicionais
 
-## Campos do Relatório
+## 📋 Campos do Relatório
 
 1. **Peça** *(obrigatório)*: Quantidade da peça utilizada
 2. **Local** *(obrigatório)*: Local onde a peça foi utilizada  
@@ -32,7 +76,7 @@ Aplicativo Flutter para técnicos criarem relatórios padronizados de peças e e
 5. **Restou** *(obrigatório)*: Quantidade que restou da peça
 6. **Código QR** *(obrigatório)*: 17 caracteres escaneados ou inseridos manualmente
 
-## Requisitos
+## 📋 Requisitos
 
 - Flutter 3.32.5 ou superior
 - Dart 3.8.1 ou superior
@@ -40,11 +84,11 @@ Aplicativo Flutter para técnicos criarem relatórios padronizados de peças e e
 - Câmera no dispositivo
 - WhatsApp instalado
 
-## Instalação
+## 🚀 Instalação
 
 1. Clone o repositório:
 ```bash
-git clone https://github.com/seu-usuario/padrao-relatorio-app.git
+git clone https://github.com/hendelsantos/padrao-relatorio-app.git
 cd padrao-relatorio-app
 ```
 
@@ -58,14 +102,14 @@ flutter pub get
 flutter run
 ```
 
-## Dependências Principais
+## 📦 Dependências Principais
 
 - `mobile_scanner: ^5.2.1` - Scanner de QR Code 
 - `url_launcher: ^6.3.0` - Integração WhatsApp e Email
 - `permission_handler: ^11.3.1` - Permissões de câmera
 - `shared_preferences: ^2.2.2` - Armazenamento local
 
-## Permissões
+## 🔒 Permissões
 
 ### Android
 - `CAMERA` - Para escanear QR codes
@@ -74,7 +118,7 @@ flutter run
 ### iOS
 - Câmera - Configurada automaticamente pelo Flutter
 
-## Como Usar
+## 📖 Como Usar
 
 ### Inventário Individual
 1. **Abra o aplicativo** → Selecione "Inventário"
@@ -93,7 +137,7 @@ flutter run
 2. **Preencha os campos** do relatório
 3. **Toque em "Enviar WhatsApp"** para gerar e enviar o relatório
 
-## Estrutura do Projeto
+## 🏗️ Estrutura do Projeto
 
 ```
 lib/
@@ -114,7 +158,7 @@ lib/
 └── widgets/                     # Widgets reutilizáveis
 ```
 
-## Desenvolvimento
+## 🤝 Desenvolvimento
 
 Para contribuir com o projeto:
 
@@ -126,16 +170,27 @@ Para contribuir com o projeto:
 
 Leia o [CONTRIBUTING.md](CONTRIBUTING.md) para mais detalhes sobre como contribuir.
 
-## Changelog
+## 📈 Changelog
 
 Veja o [CHANGELOG.md](CHANGELOG.md) para histórico de versões e mudanças.
 
-## Suporte
+## 💬 Suporte
 
-- 📋 [Issues](https://github.com/seu-usuario/padrao-relatorio-app/issues) - Reporte bugs ou sugira melhorias
-- 💬 [Discussions](https://github.com/seu-usuario/padrao-relatorio-app/discussions) - Faça perguntas ou compartilhe ideias
-- 📖 [Wiki](https://github.com/seu-usuario/padrao-relatorio-app/wiki) - Documentação adicional
+- 📋 [Issues](https://github.com/hendelsantos/padrao-relatorio-app/issues) - Reporte bugs ou sugira melhorias
+- 💬 [Discussions](https://github.com/hendelsantos/padrao-relatorio-app/discussions) - Faça perguntas ou compartilhe ideias
+- 📖 [Wiki](https://github.com/hendelsantos/padrao-relatorio-app/wiki) - Documentação adicional
 
-## Licença
+## 📞 Contato
+
+**Hendel Santos**  
+🌐 [GitHub](https://github.com/hendelsantos)  
+💼 Especialista em Django, Flutter e IA Generativa  
+🚀 Focado em soluções práticas para manutenção industrial
+
+---
+
+💡 *"O maior ativo de uma empresa é o tempo - vamos otimizá-lo com tecnologia!"*
+
+## 📄 Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
