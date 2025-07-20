@@ -44,8 +44,8 @@ Aplicativo Flutter para técnicos criarem relatórios padronizados de peças e e
 
 1. Clone o repositório:
 ```bash
-git clone https://github.com/seu-usuario/padrao_relatorio_app.git
-cd padrao_relatorio_app
+git clone https://github.com/seu-usuario/padrao-relatorio-app.git
+cd padrao-relatorio-app
 ```
 
 2. Instale as dependências:
@@ -132,9 +132,9 @@ Veja o [CHANGELOG.md](CHANGELOG.md) para histórico de versões e mudanças.
 
 ## Suporte
 
-- 📋 [Issues](https://github.com/seu-usuario/padrao_relatorio_app/issues) - Reporte bugs ou sugira melhorias
-- 💬 [Discussions](https://github.com/seu-usuario/padrao_relatorio_app/discussions) - Faça perguntas ou compartilhe ideias
-- 📖 [Wiki](https://github.com/seu-usuario/padrao_relatorio_app/wiki) - Documentação adicional
+- 📋 [Issues](https://github.com/seu-usuario/padrao-relatorio-app/issues) - Reporte bugs ou sugira melhorias
+- 💬 [Discussions](https://github.com/seu-usuario/padrao-relatorio-app/discussions) - Faça perguntas ou compartilhe ideias
+- 📖 [Wiki](https://github.com/seu-usuario/padrao-relatorio-app/wiki) - Documentação adicional
 
 ## Licença
 
