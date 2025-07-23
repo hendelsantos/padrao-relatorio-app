@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../models/inventario.dart';
 import '../services/inventario_storage_service.dart';
-import '../services/communication_service.dart';
 import 'inventario_list_screen.dart';
 
 class InventarioScreen extends StatefulWidget {
@@ -12,7 +12,8 @@ class InventarioScreen extends StatefulWidget {
   State<InventarioScreen> createState() => _InventarioScreenState();
 }
 
-class _InventarioScreenState extends State<InventarioScreen> {
+class _InventarioScreenState extends State<InventarioScreen>
+    with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _catalogController = TextEditingController();
   final _quantidadeController = TextEditingController();
@@ -21,14 +22,80 @@ class _InventarioScreenState extends State<InventarioScreen> {
   final _focController = TextEditingController();
   final _rfbController = TextEditingController();
   final _observacoesController = TextEditingController();
-  
+
   bool _escaneando = false;
   int _itensColetados = 0;
+  bool _catalogValidado = false;
+  late AnimationController _scanAnimationController;
+  late Animation<double> _scanAnimation;
+
+  // Listas para autocomplete
+  final List<String> _materiaisComuns = [
+    'Aço Inoxidável',
+    'Ferro Fundido',
+    'Alumínio',
+    'Bronze',
+    'Latão',
+    'Plástico PVC',
+    'Borracha',
+    'Cerâmica',
+    'Vidro',
+    'Madeira'
+  ];
+
+  final List<String> _tiposComuns = [
+    'Parafuso',
+    'Porca',
+    'Arruela',
+    'Vedação',
+    'Rolamento',
+    'Filtro',
+    'Válvula',
+    'Sensor',
+    'Motor',
+    'Bomba'
+  ];
 
   @override
   void initState() {
     super.initState();
     _carregarContador();
+
+    // Inicializar animação para o scanner
+    _scanAnimationController = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    );
+    _scanAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _scanAnimationController,
+      curve: Curves.easeInOut,
+    ));
+
+    // Validação em tempo real do catalog
+    _catalogController.addListener(_validarCatalog);
+  }
+
+  @override
+  void dispose() {
+    _scanAnimationController.dispose();
+    _catalogController.dispose();
+    _quantidadeController.dispose();
+    _materialController.dispose();
+    _tipoController.dispose();
+    _focController.dispose();
+    _rfbController.dispose();
+    _observacoesController.dispose();
+    super.dispose();
+  }
+
+  void _validarCatalog() {
+    final text = _catalogController.text;
+    setState(() {
+      _catalogValidado = text.isEmpty || text.length == 17;
+    });
   }
 
   Future<void> _carregarContador() async {
@@ -40,213 +107,282 @@ class _InventarioScreenState extends State<InventarioScreen> {
 
   void _escanearQR() {
     setState(() => _escaneando = true);
-    
+    _scanAnimationController.repeat();
+
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => Scaffold(
           appBar: AppBar(
             title: const Text('Escanear Catalog'),
-            backgroundColor: Colors.blue,
+            backgroundColor: Theme.of(context).primaryColor,
             foregroundColor: Colors.white,
           ),
-          body: MobileScanner(
-            onDetect: (capture) {
-              final List<Barcode> barcodes = capture.barcodes;
-              if (barcodes.isNotEmpty) {
-                final String code = barcodes.first.rawValue ?? '';
-                
-                if (code.length == 17) {
-                  setState(() {
-                    _catalogController.text = code;
-                    _escaneando = false;
-                  });
-                  Navigator.pop(context);
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Código deve ter exatamente 17 caracteres'),
-                      backgroundColor: Colors.orange,
+          body: Stack(
+            children: [
+              MobileScanner(
+                onDetect: (capture) {
+                  final List<Barcode> barcodes = capture.barcodes;
+                  for (final barcode in barcodes) {
+                    if (barcode.rawValue != null &&
+                        barcode.rawValue!.length == 17) {
+                      HapticFeedback.mediumImpact();
+                      setState(() {
+                        _catalogController.text = barcode.rawValue!;
+                        _escaneando = false;
+                      });
+                      _scanAnimationController.stop();
+                      Navigator.pop(context);
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Row(
+                            children: [
+                              const Icon(Icons.check_circle,
+                                  color: Colors.white),
+                              const SizedBox(width: 8),
+                              Text('Catalog: ${barcode.rawValue}'),
+                            ],
+                          ),
+                          backgroundColor: Colors.green,
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                      return;
+                    }
+                  }
+                },
+              ),
+              // Overlay com instruções
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.center,
+                    colors: [
+                      Colors.black.withOpacity(0.7),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Card(
+                      color: Colors.white.withOpacity(0.9),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              children: [
+                                AnimatedBuilder(
+                                  animation: _scanAnimation,
+                                  builder: (context, child) {
+                                    return Transform.scale(
+                                      scale: 0.8 + (_scanAnimation.value * 0.4),
+                                      child: Icon(
+                                        Icons.qr_code_scanner,
+                                        color: Theme.of(context).primaryColor,
+                                        size: 24,
+                                      ),
+                                    );
+                                  },
+                                ),
+                                const SizedBox(width: 12),
+                                const Expanded(
+                                  child: Text(
+                                    'Posicione o código QR no centro',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'O código deve ter 17 caracteres',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  );
-                }
-              }
-            },
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
     ).then((_) {
       setState(() => _escaneando = false);
+      _scanAnimationController.stop();
     });
+  }
+
+  void _inserirManualmente() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        final controller = TextEditingController();
+        return AlertDialog(
+          title: const Text('Inserir Catalog Manualmente'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(
+              labelText: 'Catalog (17 dígitos)',
+              hintText: '12345678901234567',
+            ),
+            maxLength: 17,
+            keyboardType: TextInputType.text,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (controller.text.length == 17) {
+                  setState(() {
+                    _catalogController.text = controller.text;
+                  });
+                  Navigator.pop(context);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('O catalog deve ter exatamente 17 dígitos'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+              child: const Text('Confirmar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildAutocompleteField({
+    required TextEditingController controller,
+    required String label,
+    required List<String> options,
+    String? Function(String?)? validator,
+    bool required = false,
+  }) {
+    return Autocomplete<String>(
+      optionsBuilder: (textEditingValue) {
+        if (textEditingValue.text.isEmpty) {
+          return const Iterable<String>.empty();
+        }
+        return options.where((option) =>
+            option.toLowerCase().contains(textEditingValue.text.toLowerCase()));
+      },
+      onSelected: (selection) {
+        controller.text = selection;
+      },
+      fieldViewBuilder: (context, textEditingController, focusNode, onFieldSubmitted) {
+        textEditingController.text = controller.text;
+        textEditingController.addListener(() {
+          controller.text = textEditingController.text;
+        });
+        
+        return TextFormField(
+          controller: textEditingController,
+          focusNode: focusNode,
+          decoration: InputDecoration(
+            labelText: required ? '$label *' : label,
+            border: const OutlineInputBorder(),
+            prefixIcon: const Icon(Icons.search),
+          ),
+          validator: validator,
+        );
+      },
+      optionsViewBuilder: (context, onSelected, options) {
+        return Align(
+          alignment: Alignment.topLeft,
+          child: Material(
+            elevation: 4,
+            child: SizedBox(
+              height: 200,
+              child: ListView.builder(
+                padding: EdgeInsets.zero,
+                itemCount: options.length,
+                itemBuilder: (context, index) {
+                  final option = options.elementAt(index);
+                  return ListTile(
+                    title: Text(option),
+                    onTap: () => onSelected(option),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Future<void> _salvarItem() async {
     if (_formKey.currentState!.validate()) {
-      try {
-        final inventario = Inventario(
-          catalog: _catalogController.text.trim(),
-          quantidadeUnrestrict: _quantidadeController.text.trim(),
-          material: _materialController.text.trim().isEmpty ? null : _materialController.text.trim(),
-          tipo: _tipoController.text.trim().isEmpty ? null : _tipoController.text.trim(),
-          foc: _focController.text.trim().isEmpty ? null : _focController.text.trim(),
-          rfb: _rfbController.text.trim().isEmpty ? null : _rfbController.text.trim(),
-          observacoes: _observacoesController.text.trim().isEmpty ? null : _observacoesController.text.trim(),
-        );
+      final inventario = Inventario(
+        catalog: _catalogController.text,
+        quantidadeUnrestrict: _quantidadeController.text,
+        material: _materialController.text,
+        tipo: _tipoController.text,
+        foc: _focController.text,
+        rfb: _rfbController.text,
+        observacoes: _observacoesController.text,
+      );
 
-        await InventarioStorageService.salvarItem(inventario);
-        
-        // Limpar campos
-        _catalogController.clear();
-        _quantidadeController.clear();
-        _materialController.clear();
-        _tipoController.clear();
-        _focController.clear();
-        _rfbController.clear();
-        _observacoesController.clear();
-        
-        // Atualizar contador
-        await _carregarContador();
-        
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Item salvo com sucesso!'),
-              backgroundColor: Colors.green,
+      await InventarioStorageService.salvarItem(inventario);
+      await _carregarContador();
+      _limparFormulario();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.save, color: Colors.white),
+                SizedBox(width: 8),
+                Text('Item salvo com sucesso!'),
+              ],
             ),
-          );
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Erro ao salvar: $e'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
+            backgroundColor: Colors.green,
+          ),
+        );
       }
     }
   }
 
-  Future<void> _enviarItemAtualPorWhatsApp() async {
-    if (_formKey.currentState!.validate()) {
-      try {
-        final inventario = Inventario(
-          catalog: _catalogController.text.trim(),
-          quantidadeUnrestrict: _quantidadeController.text.trim(),
-          material: _materialController.text.trim().isEmpty ? null : _materialController.text.trim(),
-          tipo: _tipoController.text.trim().isEmpty ? null : _tipoController.text.trim(),
-          foc: _focController.text.trim().isEmpty ? null : _focController.text.trim(),
-          rfb: _rfbController.text.trim().isEmpty ? null : _rfbController.text.trim(),
-          observacoes: _observacoesController.text.trim().isEmpty ? null : _observacoesController.text.trim(),
-        );
-
-        String mensagem = inventario.formatarParaWhatsApp();
-        
-        bool sucesso = await CommunicationService.enviarPorWhatsApp(mensagem);
-        
-        if (sucesso && mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('WhatsApp aberto com sucesso!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-        } else if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Erro ao abrir WhatsApp'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Erro: $e'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      }
-    }
-  }
-
-  Future<void> _enviarItemAtualPorEmail() async {
-    if (_formKey.currentState!.validate()) {
-      try {
-        final inventario = Inventario(
-          catalog: _catalogController.text.trim(),
-          quantidadeUnrestrict: _quantidadeController.text.trim(),
-          material: _materialController.text.trim().isEmpty ? null : _materialController.text.trim(),
-          tipo: _tipoController.text.trim().isEmpty ? null : _tipoController.text.trim(),
-          foc: _focController.text.trim().isEmpty ? null : _focController.text.trim(),
-          rfb: _rfbController.text.trim().isEmpty ? null : _rfbController.text.trim(),
-          observacoes: _observacoesController.text.trim().isEmpty ? null : _observacoesController.text.trim(),
-        );
-
-        String mensagem = inventario.formatarParaWhatsApp(); // Reutiliza a mesma formatação
-        String assunto = "Item de Inventário - ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}";
-        
-        bool sucesso = await CommunicationService.enviarPorEmail(assunto, mensagem);
-        
-        if (sucesso && mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('App de email aberto com sucesso!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-        } else if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Erro: Nenhum app de email encontrado. Instale Gmail, Outlook ou outro app de email.'),
-              backgroundColor: Colors.red,
-              duration: Duration(seconds: 4),
-            ),
-          );
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Erro: $e'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      }
-    }
+  void _limparFormulario() {
+    _catalogController.clear();
+    _quantidadeController.clear();
+    _materialController.clear();
+    _tipoController.clear();
+    _focController.clear();
+    _rfbController.clear();
+    _observacoesController.clear();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Inventário de Peças'),
-        backgroundColor: Colors.blue,
+        title: const Text('Inventário'),
+        backgroundColor: Theme.of(context).primaryColor,
         foregroundColor: Colors.white,
         actions: [
-          // Contador de itens coletados
-          Center(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              margin: const EdgeInsets.only(right: 8),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                '$_itensColetados itens',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-          // Botão para ver lista
           IconButton(
             icon: const Icon(Icons.list),
             onPressed: () {
@@ -260,217 +396,238 @@ class _InventarioScreenState extends State<InventarioScreen> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              // Campo Catalog
-              TextFormField(
-                controller: _catalogController,
-                maxLength: 17,
-                decoration: InputDecoration(
-                  labelText: 'Catalog *',
-                  hintText: 'Digite ou escaneie 17 caracteres',
-                  border: const OutlineInputBorder(),
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.qr_code_scanner),
-                    onPressed: _escaneando ? null : _escanearQR,
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Campo obrigatório';
-                  }
-                  if (value.trim().length != 17) {
-                    return 'Deve ter exatamente 17 caracteres';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-
-              // Campo Quantidade Unrestrict
-              TextFormField(
-                controller: _quantidadeController,
-                decoration: const InputDecoration(
-                  labelText: 'Quantidade Unrestrict *',
-                  hintText: 'Digite a quantidade',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Campo obrigatório';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-
-              // Campo Material
-              TextFormField(
-                controller: _materialController,
-                decoration: const InputDecoration(
-                  labelText: 'Material',
-                  hintText: 'Tipo do material (opcional)',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Campo Tipo
-              TextFormField(
-                controller: _tipoController,
-                decoration: const InputDecoration(
-                  labelText: 'Tipo',
-                  hintText: 'Classificação da peça (opcional)',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Campos FOC e RFB lado a lado
-              Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: _focController,
-                      decoration: const InputDecoration(
-                        labelText: 'FOC',
-                        hintText: 'Free of Charge',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextFormField(
-                      controller: _rfbController,
-                      decoration: const InputDecoration(
-                        labelText: 'RFB',
-                        hintText: 'Return for Billing',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
+      body: Column(
+        children: [
+          // Card de estatísticas
+          Container(
+            width: double.infinity,
+            margin: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Theme.of(context).primaryColor,
+                  Theme.of(context).primaryColor.withOpacity(0.8),
                 ],
               ),
-              const SizedBox(height: 16),
-
-              // Campo Observações
-              TextFormField(
-                controller: _observacoesController,
-                decoration: const InputDecoration(
-                  labelText: 'Observações',
-                  hintText: 'Comentários adicionais (opcional)',
-                  border: OutlineInputBorder(),
-                ),
-                maxLines: 3,
-              ),
-              const SizedBox(height: 24),
-
-              // Botões de ação
-              Column(
-                children: [
-                  // Botão Salvar Item
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: _salvarItem,
-                      icon: const Icon(Icons.save),
-                      label: const Text('Salvar Item'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  
-                  // Botão Enviar Item Atual por WhatsApp
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: _enviarItemAtualPorWhatsApp,
-                      icon: const Icon(Icons.message),
-                      label: const Text('Enviar Item por WhatsApp'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  
-                  // Botão Enviar Item Atual por Email
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: _enviarItemAtualPorEmail,
-                      icon: const Icon(Icons.email),
-                      label: const Text('Enviar Item por Email'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              
-              const SizedBox(height: 16),
-              
-              // Informações adicionais
-              Card(
-                color: Colors.blue.shade50,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.inventory, color: Colors.white, size: 32),
+                const SizedBox(width: 16),
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          Icon(Icons.info, color: Colors.blue.shade700),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Informações',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.blue.shade700,
-                            ),
-                          ),
-                        ],
+                      const Text(
+                        'Itens Coletados',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                      const SizedBox(height: 8),
-                      const Text('• Campos marcados com * são obrigatórios'),
-                      const Text('• O catalog deve ter exatamente 17 caracteres'),
-                      const Text('• Itens salvos podem ser enviados em lote'),
-                      const Text('• Use o ícone de lista para ver itens coletados'),
+                      Text(
+                        '$_itensColetados',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
+          // Formulário
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    // Campo Catalog com scanner
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: _catalogController,
+                            decoration: InputDecoration(
+                              labelText: 'Catalog',
+                              border: const OutlineInputBorder(),
+                              prefixIcon: Icon(
+                                Icons.qr_code,
+                                color: _catalogValidado
+                                    ? Colors.green
+                                    : Theme.of(context).iconTheme.color,
+                              ),
+                              suffixIcon: _catalogValidado
+                                  ? const Icon(Icons.check_circle,
+                                      color: Colors.green)
+                                  : null,
+                            ),
+                            maxLength: 17,
+                            validator: (value) {
+                              if (value != null && value.isNotEmpty && value.length != 17) {
+                                return 'Catalog deve ter 17 caracteres';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Column(
+                          children: [
+                            ElevatedButton(
+                              onPressed: _escaneando ? null : _escanearQR,
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.all(12),
+                              ),
+                              child: _escaneando
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2),
+                                    )
+                                  : const Icon(Icons.qr_code_scanner),
+                            ),
+                            const SizedBox(height: 8),
+                            TextButton(
+                              onPressed: _inserirManualmente,
+                              child: const Text('Manual',
+                                  style: TextStyle(fontSize: 12)),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Quantidade
+                    TextFormField(
+                      controller: _quantidadeController,
+                      decoration: const InputDecoration(
+                        labelText: 'Quantidade *',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.numbers),
+                      ),
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value?.isEmpty ?? true) {
+                          return 'Quantidade é obrigatória';
+                        }
+                        if (int.tryParse(value!) == null) {
+                          return 'Digite um número válido';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Material com autocomplete
+                    _buildAutocompleteField(
+                      controller: _materialController,
+                      label: 'Material',
+                      options: _materiaisComuns,
+                      required: false,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Tipo com autocomplete
+                    _buildAutocompleteField(
+                      controller: _tipoController,
+                      label: 'Tipo',
+                      options: _tiposComuns,
+                      required: false,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // FOC
+                    TextFormField(
+                      controller: _focController,
+                      decoration: const InputDecoration(
+                        labelText: 'FOC',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.info_outline),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // RFB
+                    TextFormField(
+                      controller: _rfbController,
+                      decoration: const InputDecoration(
+                        labelText: 'RFB',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.receipt),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Observações
+                    TextFormField(
+                      controller: _observacoesController,
+                      decoration: const InputDecoration(
+                        labelText: 'Observações',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.note_alt),
+                      ),
+                      maxLines: 3,
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Botões
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: _salvarItem,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).primaryColor,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.save),
+                                SizedBox(width: 8),
+                                Text('Salvar Item'),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: _limparFormulario,
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.clear),
+                                SizedBox(width: 8),
+                                Text('Limpar'),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _catalogController.dispose();
-    _quantidadeController.dispose();
-    _materialController.dispose();
-    _tipoController.dispose();
-    _focController.dispose();
-    _rfbController.dispose();
-    _observacoesController.dispose();
-    super.dispose();
   }
 }
