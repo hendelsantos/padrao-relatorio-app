@@ -239,7 +239,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Relatório de Manutenção',
+          'Relatório de Peças',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -253,30 +253,6 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Card de instruções
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.info_outline,
-                        size: 32,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Preencha os dados abaixo para gerar seu relatório de manutenção',
-                        style: TextStyle(fontSize: 16),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              
-              const SizedBox(height: 20),
-
               // Código QR
               Card(
                 child: Padding(
@@ -339,7 +315,7 @@ class _HomePageState extends State<HomePage> {
                   labelText: 'Peça (quantidade) *',
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.build),
-                  helperText: 'Ex: Parafuso M8 - 2 unidades',
+                  helperText: 'Digite somente a quantidade',
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
@@ -465,58 +441,6 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ],
-              ),
-
-              const SizedBox(height: 16),
-
-              // Footer com créditos
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                margin: const EdgeInsets.only(top: 8),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade50,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade200),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Desenvolvido por ',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey.shade600,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.code,
-                            size: 16,
-                            color: Theme.of(context).primaryColor,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Hendel',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Theme.of(context).primaryColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
               ),
 
               const SizedBox(height: 16),
