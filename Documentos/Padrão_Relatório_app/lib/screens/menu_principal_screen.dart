@@ -31,69 +31,24 @@ class _MenuPrincipalScreenState extends State<MenuPrincipalScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[_selectedIndex],
-      bottomNavigationBar: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Footer com desenvolvedor
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade50,
-              border: Border(
-                top: BorderSide(color: Colors.grey.shade300, width: 0.5),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  'Desenvolvido por ',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
-                ),
-                const Text(
-                  '</>',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,
-                  ),
-                ),
-                const Text(
-                  'Hendel',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                ),
-              ],
-            ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: Theme.of(context).primaryColor,
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.assignment),
+            label: 'Relatório de Peças',
           ),
-          // Navigation Bar
-          BottomNavigationBar(
-            currentIndex: _selectedIndex,
-            onTap: _onItemTapped,
-            type: BottomNavigationBarType.fixed,
-            selectedItemColor: Theme.of(context).primaryColor,
-            unselectedItemColor: Colors.grey,
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.assignment),
-                label: 'Relatório de Peças',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.inventory),
-                label: 'Inventário',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.info),
-                label: 'Sobre',
-              ),
-            ],
+          BottomNavigationBarItem(
+            icon: Icon(Icons.inventory),
+            label: 'Inventário',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.info),
+            label: 'Sobre',
           ),
         ],
       ),

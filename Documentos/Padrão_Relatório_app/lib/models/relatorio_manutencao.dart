@@ -16,23 +16,14 @@ class RelatorioManutencao {
   });
 
   String formatarParaWhatsApp() {
-    String relatorio = '''
-Peça
-$peca
-Local
-$local''';
-    
-    // Adiciona ordem apenas se não estiver vazia
-    if (ordem.isNotEmpty) {
-      relatorio += '\n$ordem';
-    }
-    
-    relatorio += '''
+    String mensagem = 'Peça\n';
+    mensagem += '$peca\n';
+    mensagem += '$local\n';
+    mensagem += '$ordem\n';
+    mensagem += '${retornoEstoque ? 'Sim' : 'Não'}\n';
+    mensagem += '$restou\n';
+    mensagem += '$codigoQr';
 
-${retornoEstoque ? 'Sim' : 'Não'}
-$restou
-$codigoQr''';
-
-    return relatorio;
+    return mensagem;
   }
 }
