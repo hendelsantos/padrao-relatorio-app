@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>HOME • CONTROLE DE NOTA FISCAL PARA MIGO</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <link rel="icon" type="image/svg+xml" href="assets/img/favicon-nf.svg" />
+    <script>
+      window.APP_CONFIG = window.APP_CONFIG || { API_BASE_URL: '' };
+    </script>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="navbar-logo">
+        <img src="assets/img/favicon-nf.svg" alt="NF" width="28" height="28" style="vertical-align:middle;margin-right:0.5em;">
+        <span>Controle de NF</span>
+      </div>
+      <div class="navbar-links">
+        <a href="index.html" class="navbar-title">HOME</a>
+        <a href="sobre.html" class="navbar-title">SOBRE</a>
+      </div>
+    </nav>
+    <header class="hero">
+      <div class="hero-title-bg">
+        <h1>HOME • CONTROLE DE NOTA FISCAL PARA MIGO</h1>
+      </div>
+      <p>Selecione o departamento para lançar e acompanhar NFs</p>
+    </header>
+    <div class="painel-fosco-home" style="max-width:900px;margin:2.2rem auto 1.5rem auto;background:rgba(255,255,255,0.22);border-radius:22px;box-shadow:0 8px 32px rgba(79,140,255,0.13);backdrop-filter:blur(12px);padding:2rem 2.2rem;text-align:center;">
+      <h2 style="color:#111;font-size:1.35rem;font-weight:800;letter-spacing:1px;margin-bottom:1.1rem;">Painel de Acesso Rápido</h2>
+      <p style="font-size:1.08rem;color:#111;font-weight:500;line-height:1.6;">Selecione o departamento abaixo para registrar ou consultar notas fiscais. Utilize os filtros e navegue pelo menu.</p>
+    </div>
+    <main style="min-height: 80vh; padding-bottom: 80px;">
+      <section class="cards-home">
+        <a class="card-home" href="departamento.html?codigo=T001">
+          <div class="card-icon"><img src="assets/img/departamentos/t001.png" alt="Estamparia" width="38" height="38" style="vertical-align:middle;"> T001</div>
+          <p>Acessar controle do departamento</p>
+        </a>
+        <a class="card-home" href="departamento.html?codigo=T002">
+          <div class="card-icon"><img src="assets/img/departamentos/t002.png" alt="Solda" width="38" height="38" style="vertical-align:middle;"> T002</div>
+          <p>Acessar controle do departamento</p>
+        </a>
+        <a class="card-home" href="departamento.html?codigo=T003">
+          <div class="card-icon"><img src="assets/img/departamentos/t003.png" alt="Pintura" width="38" height="38" style="vertical-align:middle;"> T003</div>
+          <p>Acessar controle do departamento</p>
+        </a>
+        <a class="card-home" href="departamento.html?codigo=T004">
+          <div class="card-icon"><img src="assets/img/departamentos/t004.png" alt="Assembly" width="38" height="38" style="vertical-align:middle;"> T004</div>
+          <p>Acessar controle do departamento</p>
+        </a>
+        <a class="card-home" href="departamento.html?codigo=T005">
+          <div class="card-icon"><img src="assets/img/departamentos/t005.png" alt="Motores" width="38" height="38" style="vertical-align:middle;"> T005</div>
+          <p>Acessar controle do departamento</p>
+        </a>
+      </section>
+    </main>
+    <footer style="background:rgba(255,255,255,0.18);backdrop-filter:blur(8px);border-radius:16px 16px 0 0;box-shadow:0 -2px 12px rgba(79,140,255,0.09);margin-top:2.2rem;">
+      <div style="text-align:center; color:#222; opacity:0.85; padding:1rem 0; font-size:1.02rem; font-weight:500; letter-spacing:1px;">
+        <small><span id="ano-footer"></span> • Nota Fiscal • HOME</small>
+      </div>
+    </footer>
+    <script>
+      document.getElementById('ano-footer').textContent = new Date().getFullYear();
+    </script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/main.js"></script>
+  </body>
+</html>

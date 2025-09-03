@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sobre • Controle de Nota Fiscal</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <link rel="icon" type="image/svg+xml" href="assets/img/favicon-nf.svg" />
+  </head>
+  <body style="min-height:100vh;overflow-y:auto;box-sizing:border-box;padding-bottom:80px;">
+    <nav class="navbar">
+      <div class="navbar-logo">
+        <img src="assets/img/favicon-nf.svg" alt="NF" width="28" height="28" style="vertical-align:middle;margin-right:0.5em;">
+        <span>Controle de NF</span>
+      </div>
+      <div class="navbar-links">
+        <a href="index.html" class="navbar-title">HOME</a>
+        <a href="sobre.html" class="navbar-title">SOBRE</a>
+      </div>
+    </nav>
+    <header class="hero">
+      <div class="hero-title-bg">
+        <h1>Sobre o Projeto</h1>
+      </div>
+      <p><a href="index.html" style="color:#fff;text-decoration:underline;">← Voltar para HOME</a></p>
+    </header>
+    <main style="max-width:680px;margin:2rem auto 2rem auto;background:rgba(255,255,255,0.22);border-radius:18px;padding:2rem 2.2rem;box-shadow:0 8px 32px rgba(79,140,255,0.13);backdrop-filter:blur(8px);">
+      <h2 style="color:#222;font-size:1.38rem;font-weight:800;margin-bottom:1.2rem;letter-spacing:1px;">Objetivo do Projeto</h2>
+      <p style="font-size:1.12rem;color:#222;font-weight:500;line-height:1.7;">
+        Sistema para controle, registro e acompanhamento de Notas Fiscais (NF) por departamento. Permite registrar, filtrar, fazer upload/download de arquivos e acompanhar o status MIGO de forma ágil e visual.
+      </p>
+      <h2 style="color:#222;font-size:1.22rem;font-weight:800;margin-top:2.2rem;letter-spacing:1px;">Desenvolvedores</h2>
+      <ul style="font-size:1.12rem;color:#222;line-height:1.7;list-style:none;padding:0;font-weight:500;">
+        <li><strong>Hendel Santos</strong><br>E-mail: hendel.santos@hyundai-brasil.com</li>
+        <li style="margin-top:1.2rem;"><strong>Ederson Moraes</strong><br>E-mail: ederson.moraes@hyundai-brasil.com</li>
+      </ul>
+      <h2 style="color:#222;font-size:1.22rem;font-weight:800;margin-top:2.2rem;letter-spacing:1px;">Relatar Bugs ou Sugerir Melhorias</h2>
+      <p style="font-size:1.12rem;color:#222;font-weight:700;line-height:1.7;">
+        Para reportar problemas ou sugerir melhorias, envie um e-mail para os desenvolvedores.<br>
+        Sua colaboração é fundamental para evoluir o sistema!
+      </p>
+    </main>
+    <footer style="background:rgba(255,255,255,0.18);backdrop-filter:blur(8px);border-radius:16px 16px 0 0;box-shadow:0 -2px 12px rgba(79,140,255,0.09);margin-top:2.2rem;">
+      <div style="text-align:center; color:#222; opacity:0.85; padding:1rem 0; font-size:1.02rem; font-weight:500; letter-spacing:1px;">
+        <small><span id="ano-footer"></span> • Nota Fiscal • Sobre o Projeto</small>
+      </div>
+    </footer>
+    <script>
+      document.getElementById('ano-footer').textContent = new Date().getFullYear();
+    </script>
+  </body>
+</html>

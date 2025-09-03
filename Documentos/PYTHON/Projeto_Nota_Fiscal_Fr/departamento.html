@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Departamento - Controle de NF</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <script>
+      window.APP_CONFIG = window.APP_CONFIG || { API_BASE_URL: '' };
+      // Opcionalmente, o backend Flask pode injetar:
+      // window.__NOTAS_INICIAIS__ = [ { ... } ];
+    </script>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="navbar-logo">
+        <img src="assets/img/favicon-nf.svg" alt="NF" width="28" height="28" style="vertical-align:middle;margin-right:0.5em;">
+        <span>Controle de NF</span>
+      </div>
+      <div class="navbar-links">
+        <a href="index.html" class="navbar-title">HOME</a>
+        <a href="sobre.html" class="navbar-title">SOBRE</a>
+      </div>
+    </nav>
+
+    <header class="hero">
+      <div class="hero-title-bg">
+        <h1 id="titulo-departamento">Departamento</h1>
+      </div>
+      <p class="breadcrumbs"><a href="index.html">HOME</a> › <span id="bc-depto">Departamento</span></p>
+    </header>
+
+    <main class="pagina-departamento">
+      <section class="secao-form">
+        <h2>Cadastrar Nova Nota Fiscal</h2>
+        <form id="form-nf" enctype="multipart/form-data">
+          <div class="grid-form">
+            <label>
+              Data de Emissão
+              <input type="date" name="data_emissao" required />
+            </label>
+            <label>
+              Nº da Nota Fiscal
+              <input type="text" name="numero_nf" required />
+            </label>
+            <label>
+              Fornecedor
+              <input type="text" name="fornecedor" required />
+            </label>
+            <label>
+              Pedidos<br><span style="font-size:0.92em;color:#666;font-weight:400;">(separados por vírgula)</span>
+              <input type="text" name="pedidos" placeholder="45001, 45002" required />
+            </label>
+            <label>
+              Data de Recebimento
+              <input type="date" name="data_recebimento" required />
+            </label>
+            <label style="display:flex;flex-direction:column;align-items:flex-start;gap:0.3rem;">
+              <span style="font-size:1.02rem;color:#222;font-weight:700;letter-spacing:1px;">Upload PDF</span>
+              <input type="file" name="arquivo_pdf" accept="application/pdf,.pdf" required style="border:none;background:none;padding:0;" />
+              <span style="font-size:0.92rem;color:#888;font-style:italic;">Selecione o arquivo da nota fiscal</span>
+            </label>
+          </div>
+          <div class="acoes-form">
+            <button type="submit" class="btn primario">Salvar Nota Fiscal</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="secao-tabela">
+        <form id="filtro-notas" class="filtro-notas" style="display:flex;gap:1rem;align-items:center;justify-content:flex-end;margin-bottom:1.2rem;flex-wrap:wrap;">
+          <label style="font-size:1rem;color:#222;">
+            Ano:
+            <select name="ano" style="padding:0.5rem 1rem;border-radius:8px;border:1px solid #ccc;font-size:1rem;">
+              <option value="">Todos</option>
+              <option value="2025">2025</option>
+              <option value="2024">2024</option>
+              <option value="2023">2023</option>
+            </select>
+          </label>
+          <label style="font-size:1rem;color:#222;">
+            Mês:
+            <select name="mes" style="padding:0.5rem 1rem;border-radius:8px;border:1px solid #ccc;font-size:1rem;">
+              <option value="">Todos</option>
+              <option value="01">Janeiro</option>
+              <option value="02">Fevereiro</option>
+              <option value="03">Março</option>
+              <option value="04">Abril</option>
+              <option value="05">Maio</option>
+              <option value="06">Junho</option>
+              <option value="07">Julho</option>
+              <option value="08">Agosto</option>
+              <option value="09">Setembro</option>
+              <option value="10">Outubro</option>
+              <option value="11">Novembro</option>
+              <option value="12">Dezembro</option>
+            </select>
+          </label>
+          <button type="submit" class="btn primario" style="padding:0.6rem 1.4rem;font-size:1rem;">Filtrar</button>
+        </form>
+        <div style="text-align:right; margin-bottom:1rem;">
+          <a href="index.html" class="btn" style="background:linear-gradient(90deg,#4f8cff,#764ba2);color:#fff;border-radius:22px;padding:0.6rem 1.4rem;font-weight:600;box-shadow:0 2px 8px rgba(79,140,255,0.12);text-decoration:none;">← Voltar para HOME</a>
+        </div>
+        <h2>Notas Fiscais do Departamento</h2>
+        <div class="tabela-responsiva">
+          <table id="tabela-notas">
+            <thead>
+              <tr>
+                <th>Data de Emissão</th>
+                <th>Nº da Nota Fiscal</th>
+                <th>Fornecedor</th>
+                <th>Pedidos</th>
+                <th>Data de Recebimento</th>
+                <th>Status MIGO</th>
+                <th>Nº da MIGO</th>
+                <th style="font-weight:700;letter-spacing:1px;color:#4f8cff;background:rgba(255,255,255,0.18);border-radius:8px 8px 0 0;">Upload / Baixar PDF</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- linhas renderizadas via JS -->
+              <tr>
+                <td>2023-10-01</td>
+                <td>123456</td>
+                <td>Fornecedor Exemplo</td>
+                <td>45001, 45002</td>
+                <td>2023-10-02</td>
+                <td>Concluído</td>
+                <td>78910</td>
+                <td>
+                  <a href="#" class="btn-download-pdf-link" title="Download do PDF da Nota">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 32 32" style="vertical-align:middle;margin-right:0.4em;">
+                      <rect x="4" y="4" width="24" height="24" rx="6" fill="#d32f2f"/>
+                      <rect x="8" y="10" width="16" height="10" rx="2" fill="#fff"/>
+                      <text x="16" y="22" text-anchor="middle" font-size="11" font-family="Arial" fill="#d32f2f" font-weight="bold">PDF</text>
+                      <path d="M16 24 l0 4" stroke="#fff" stroke-width="2"/>
+                      <path d="M13 28 l6 0" stroke="#fff" stroke-width="2"/>
+                    </svg>
+                    <span style="font-weight:700;color:#fff;vertical-align:middle;text-shadow:0 2px 8px #d32f2f88;">PDF</span>
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <div id="alerta-codigo" style="display:none;color:#d32f2f;font-weight:700;font-size:1.08rem;text-align:center;margin-bottom:1.2rem;background:rgba(255,255,255,0.22);border-radius:12px;padding:0.7rem 1.2rem;"></div>
+    </main>
+
+    <footer style="background:rgba(255,255,255,0.18);backdrop-filter:blur(8px);border-radius:16px 16px 0 0;box-shadow:0 -2px 12px rgba(79,140,255,0.09);margin-top:2.2rem;">
+      <div style="text-align:center; color:#222; opacity:0.85; padding:1rem 0; font-size:1.02rem; font-weight:500; letter-spacing:1px;">
+        <small><span id="ano-footer"></span> • Nota Fiscal • Departamento</small>
+      </div>
+    </footer>
+    <script>
+      document.getElementById('ano-footer').textContent = new Date().getFullYear();
+    </script>
+    <script>
+      (function(){
+        var url = 'assets/img/logo.png';
+        var img = new Image();
+        img.onload = function(){ document.body.style.setProperty('--bg-image', 'url(' + url + ')'); };
+        img.src = url;
+      })();
+    </script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/departamento.js"></script>
+    <script>
+      // atualiza breadcrumb com o código do departamento
+      (function(){
+        var params = new URLSearchParams(location.search);
+        var cod = params.get('codigo') || 'T001';
+        var bc = document.getElementById('bc-depto');
+        if(bc) bc.textContent = 'Departamento ' + cod;
+      })();
+    </script>
+    <script>
+      // Detecta o código do departamento na URL e aplica a cor
+      const params = new URLSearchParams(window.location.search);
+      const codigo = params.get('codigo');
+      const alertaCodigo = document.getElementById('alerta-codigo');
+      const formNF = document.getElementById('form-nf');
+      if (!codigo || !/^T00[1-5]$/.test(codigo)) {
+        alertaCodigo.style.display = 'block';
+        alertaCodigo.textContent = 'Erro: Departamento não identificado. Volte à HOME e selecione o departamento correto.';
+        if(formNF) formNF.style.display = 'none';
+      } else {
+        alertaCodigo.style.display = 'none';
+        if(formNF) formNF.style.display = '';
+        document.querySelector('.pagina-departamento').classList.add(codigo.toLowerCase());
+      }
+    </script>
+  </body>
+  </html>

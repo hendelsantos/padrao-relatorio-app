@@ -1,0 +1,30 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Serve Frontend (http.server 8000)",
+			"type": "shell",
+			"command": "python3",
+			"args": [
+				"-m",
+				"http.server",
+				"8000"
+			],
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Run Flask Backend (dev)",
+			"type": "shell",
+			"command": "bash",
+			"args": [
+				"-lc",
+				"python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt && cp -n .env.example .env || true && python app.py"
+			],
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CONTROLE DE NOTA FISCAL PARA MIGO</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}" />
+  </head>
+  <body>
+    <!-- Logo embassado será aplicado via CSS --bg-image -->
+    <header class="hero">
+      <div class="hero-title-bg">
+        <h1>CONTROLE DE NOTA FISCAL PARA MIGO</h1>
+      </div>
+      <p>Selecione o departamento para lançar e acompanhar NFs</p>
+    </header>
+
+    <main>
+      <section class="cards cards-home">
+        {% for d in departamentos %}
+        <a class="card card-home" href="{{ url_for('departamento', codigo=d) }}">
+          <div class="card-icon">{{ d }}</div>
+          <h3>Departamento {{ d }}</h3>
+          <p>Acessar controle do departamento</p>
+        </a>
+        {% endfor %}
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-meta">
+        <div class="devs">
+          <strong>Desenvolvedores</strong><br />
+          Hendel Santos<br />
+          <span>E-mail: hendel.santos@hyundai-brasil.com</span><br />
+          Ederson Moraes<br />
+          <span>E-mail: ederson.moraes@hyundai-brasil.com</span>
+        </div>
+        <div class="title"><small>Nota Fiscal • Dashboard</small></div>
+      </div>
+    </footer>
+  </body>
+  <script>
+    (function(){
+      // tenta localizar a logo em diversas rotas e extensões
+      var candidatos = [
+        '/assets/img/logo.png', '/assets/img/logo.jpg', '/assets/img/logo.jpeg', '/assets/img/logo.svg',
+        '/assests/img/logo.png', '/assests/img/logo.jpg', '/assests/img/logo.jpeg',
+        '{{ url_for('static', filename='img/logo.png') }}', '{{ url_for('static', filename='img/logo.jpg') }}'
+      ];
+      var i = 0;
+      function tentar(){
+        if(i >= candidatos.length) return;
+        var url = candidatos[i++];
+        var img = new Image();
+        img.onload = function(){ document.body.style.setProperty('--bg-image', 'url(' + url + ')'); };
+        img.onerror = tentar;
+        img.src = url + '?v=' + Date.now();
+      }
+      tentar();
+    })();
+  </script>
+</html>
